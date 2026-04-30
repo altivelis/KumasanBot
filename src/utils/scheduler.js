@@ -12,14 +12,9 @@ const TZ = 'Asia/Tokyo';
  */
 function startScheduler(client) {
   // 月末 23:59 JST にランキング投稿
-  cron.schedule('59 23 28-31 * *', async () => {
-    const now = new Date();
-    // 月の最終日かチェック
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    if (tomorrow.getMonth() !== now.getMonth()) {
-      await postAndResetRanking(client);
-    }
+  // L（last）修飾子で月の最終日のみ発火させる
+  cron.schedule('59 23 L * *', async () => {
+    await postAndResetRanking(client);
   }, { timezone: TZ });
 
   // 毎月1日 00:01 JST にランキングリセット（投稿はすでに月末に済んでいる）
