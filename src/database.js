@@ -83,6 +83,19 @@ function resetMonthlyVc() {
   db.prepare('UPDATE users SET monthly_vc_minutes = 0').run();
 }
 
+function resetAllUsers() {
+  db.prepare(`
+    UPDATE users SET
+      balance = 0,
+      gacha_tickets = 0,
+      total_vc_minutes = 0,
+      weekly_vc_minutes = 0,
+      monthly_vc_minutes = 0,
+      ticket_accum_minutes = 0,
+      vc_join_time = NULL
+  `).run();
+}
+
 function getMonthlyRanking(limit = 10) {
   return db
     .prepare('SELECT user_id, monthly_vc_minutes FROM users ORDER BY monthly_vc_minutes DESC LIMIT ?')
@@ -152,6 +165,7 @@ module.exports = {
   getAllActiveVcUsers,
   resetWeeklyVc,
   resetMonthlyVc,
+  resetAllUsers,
   getMonthlyRanking,
   getGuildSettings,
   setGuildSetting,

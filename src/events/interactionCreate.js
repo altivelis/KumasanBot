@@ -1,7 +1,7 @@
 'use strict';
 
 const { Events, EmbedBuilder, MessageFlags } = require('discord.js');
-const { getUser, updateUser, getGuildSettings } = require('../database');
+const { getUser, updateUser, getGuildSettings, resetAllUsers } = require('../database');
 const { drawGacha } = require('../handlers/gacha');
 const { playGamble } = require('../handlers/gamble');
 const { changeBalance, transfer } = require('../handlers/economy');
@@ -151,6 +151,31 @@ module.exports = {
           .setDescription(`<@${targetId}> が <@${requesterId}> への請求を拒否しました`);
 
         await interaction.editReply({ embeds: [embed], components: [] });
+        return;
+      }
+
+      // ---- usersリセット確認 ----
+      if (customId.startsWith('resetusers_confirm:')) {
+        const [, executorId] = customId.split(':');
+        if (user.id !== executorId) {
+          return interaction.reply({ content: '❌ この操作はあなたには許可されていません。', flags: MessageFlags.Ephemeral });
+        }
+
+        await interaction.deferUpdate();
+        resetAllUsers();
+        await interaction.editReply({ content: '✅ 全ユーザーデータを初期値にリセットしました。', embeds: [], components: [] });
+        return;
+      }
+
+      // ---- usersリセットキャンセル ----
+      if (customId.startsWith('resetusers_cancel:')) {
+        const [, executorId] = customId.split(':');
+        if (user.id !== executorId) {
+          return interaction.reply({ content: '❌ この操作はあなたには許可されていません。', flags: MessageFlags.Ephemeral });
+        }
+
+        await interaction.deferUpdate();
+        await interaction.editReply({ content: '❌ リセットをキャンセルしました。', embeds: [], components: [] });
         return;
       }
     }

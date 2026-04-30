@@ -34,3 +34,7 @@
 - [x] 30. /admin addshopitem / removeshopitem サブコマンド実装
 - [x] 31. /admin resetranking サブコマンド実装
 - [x] 32. 全コマンドを deploy-commands.js に登録・動作確認
+- [x] 33. database.js に `resetAllUsers()` 関数を追加
+- [x] 34. /admin resetusers サブコマンド定義を admin.js に追加
+- [x] 35. resetusers の確認ボタンハンドラを interactionCreate.js に追加
+- [x] 36. deploy-commands.js を再実行してスラッシュコマンドを更新

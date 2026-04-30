@@ -6,6 +6,9 @@ const {
   PermissionFlagsBits,
   MessageFlags,
   ChannelType,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
 } = require('discord.js');
 const {
   setGuildSetting,
@@ -16,6 +19,7 @@ const {
   addShopItem,
   removeShopItem,
   resetMonthlyVc,
+  resetAllUsers,
 } = require('../database');
 const { changeBalance } = require('../handlers/economy');
 const { sendPanel } = require('../handlers/panel');
@@ -97,6 +101,10 @@ module.exports = {
     // ランキングリセット
     .addSubcommand(sub =>
       sub.setName('resetranking').setDescription('月間ランキングを手動リセット（投稿してリセット）')
+    )
+    // usersテーブルリセット
+    .addSubcommand(sub =>
+      sub.setName('resetusers').setDescription('全ユーザーデータを初期値にリセット（残高・チケット・VC時間など）')
     ),
 
   async execute(interaction) {
@@ -180,6 +188,25 @@ module.exports = {
     if (sub === 'resetranking') {
       await postAndResetRanking(interaction.client);
       return interaction.reply({ content: '✅ ランキングを投稿してリセットしました。', flags: MessageFlags.Ephemeral });
+    }
+
+    // --- resetusers ---
+    if (sub === 'resetusers') {
+      const embed = new EmbedBuilder()
+        .setTitle('⚠️ ユーザーデータリセット確認')
+        .setDescription('**全ユーザー**の残高・ガチャ券・VC時間などをすべて初期値に戻します。\nこの操作は取り消せません。本当に実行しますか？')
+        .setColor(0xe74c3c);
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`resetusers_confirm:${interaction.user.id}`)
+          .setLabel('✅ リセット実行')
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId(`resetusers_cancel:${interaction.user.id}`)
+          .setLabel('❌ キャンセル')
+          .setStyle(ButtonStyle.Secondary),
+      );
+      return interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
     }
   },
 };

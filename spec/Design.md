@@ -232,6 +232,29 @@ node-cron: 毎月1日 00:01（Asia/Tokyo）
 | `addshopitem` | ショップ商品追加 |
 | `removeshopitem` | ショップ商品削除 |
 | `resetranking` | 月間ランキング手動リセット |
+| `resetusers` | 全ユーザーデータを初期値にリセット（確認ボタン付き） |
+
+---
+
+## `/admin resetusers` 処理フロー
+
+```
+/admin resetusers 実行
+  ├─ 確認ボタン（「✅ リセット実行」「❌ キャンセル」）付きEmbedを ephemeral で表示
+  ├─ 「✅ リセット実行」押下
+  │   ├─ resetAllUsers() を呼び出す
+  │   │   └─ UPDATE users SET balance=0, gacha_tickets=0,
+  │   │          total_vc_minutes=0, weekly_vc_minutes=0,
+  │   │          monthly_vc_minutes=0, ticket_accum_minutes=0,
+  │   │          vc_join_time=NULL
+  │   └─ 完了メッセージを ephemeral で更新
+  └─ 「❌ キャンセル」押下
+      └─ キャンセルメッセージを ephemeral で更新
+```
+
+- ボタンの `customId`: `resetusers_confirm` / `resetusers_cancel`
+- ボタン操作者が元のコマンド実行者と一致するか `interaction.user.id` で検証する
+- 確認ボタンはコマンド実行者のみ操作可能（他の管理者が誤って押せないようにする）
 
 ---
 
@@ -271,3 +294,4 @@ node-cron: 毎月1日 00:01（Asia/Tokyo）
 |------|------|
 | 2026-04-29 | 初版作成 |
 | 2026-04-29 | タイムゾーン設計を追加（JST固定）、node-cronにAsia/Tokyo指定を明記 |
+| 2026-04-30 | `/admin resetusers` コマンドの設計を追加（全ユーザーデータ初期化、確認ボタン付き） |
