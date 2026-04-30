@@ -1,0 +1,36 @@
+# タスクリスト — KumasanBot
+
+## タスクリスト
+
+- [x] 1. プロジェクト初期化（package.json / .env / .gitignore）
+- [x] 2. SQLiteデータベース初期化（database.js・全テーブル作成）
+- [x] 3. Botエントリーポイント作成（index.js・process.env.TZ設定）
+- [x] 4. コマンドローダー・イベントローダー実装
+- [x] 5. deploy-commands.js 作成（スラッシュコマンド登録スクリプト）
+- [x] 6. permissions.js 作成（管理者権限チェックユーティリティ）
+- [x] 7. voiceStateUpdate.js 実装（VC入退室検知・Bot除外・除外カテゴリ判定）
+- [x] 8. vcPoint.js 実装（ポイント付与・ガチャ券発行・ticket_accum_minutes管理）
+- [x] 9. ready.js 実装（Bot起動時の未精算VC分の精算処理）
+- [x] 10. economy.js 実装（残高操作・送金・共通ポイント変動関数）
+- [x] 11. logger.js 実装（P変動ログEmbed送信）
+- [x] 12. /balance コマンド実装
+- [x] 13. /status コマンド実装
+- [x] 14. /pay コマンド実装
+- [x] 15. /request コマンド実装（承認/拒否ボタン・操作者検証）
+- [x] 16. gacha.js 実装（抽選ロジック）
+- [x] 17. gamble.js 実装（抽選ロジック・全ロス時ロールメンション処理）
+- [x] 18. panel.js 実装（統合パネルEmbed・ボタン生成）
+- [x] 19. /admin gacha panel コマンド実装（パネル設置・旧パネル削除）
+- [x] 20. interactionCreate.js 実装（gacha_pull / gamble_play ボタンハンドラ）
+- [x] 21. ranking.js ハンドラ実装（月間ランキング集計・Embed生成）
+- [x] 22. /ranking コマンド実装
+- [x] 23. scheduler.js 実装（node-cron 月末23:59投稿・月初00:01リセット・週次リセット、すべてAsia/Tokyo）
+- [x] 24. shop.js ハンドラ実装（商品一覧表示・購入処理・ロール付与）
+- [x] 25. /shop コマンド実装
+- [x] 26. /buy コマンド実装
+- [x] 27. /admin setchannel サブコマンド実装（ranking / result / log）
+- [x] 28. /admin addexclude / removeexclude / listexclude サブコマンド実装
+- [x] 29. /admin give / take サブコマンド実装
+- [x] 30. /admin addshopitem / removeshopitem サブコマンド実装
+- [x] 31. /admin resetranking サブコマンド実装
+- [x] 32. 全コマンドを deploy-commands.js に登録・動作確認
