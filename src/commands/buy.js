@@ -1,6 +1,6 @@
 'use strict';
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const { purchaseItem } = require('../handlers/shop');
 
 module.exports = {
@@ -19,6 +19,6 @@ module.exports = {
       itemId,
       interaction.member
     );
-    await interaction.reply({ content: result.message, ephemeral: !result.success });
+    await interaction.reply({ content: result.message, flags: result.success ? undefined : MessageFlags.Ephemeral });
   },
 };

@@ -4,6 +4,8 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
+  ChannelType,
 } = require('discord.js');
 const {
   setGuildSetting,
@@ -55,11 +57,17 @@ module.exports = {
     // 除外カテゴリ
     .addSubcommand(sub =>
       sub.setName('addexclude').setDescription('ポイントカウント対象外カテゴリを追加')
-        .addStringOption(o => o.setName('category_id').setDescription('カテゴリID').setRequired(true))
+        .addChannelOption(o =>
+          o.setName('category').setDescription('除外するカテゴリ').setRequired(true)
+            .addChannelTypes(ChannelType.GuildCategory)
+        )
     )
     .addSubcommand(sub =>
       sub.setName('removeexclude').setDescription('対象外カテゴリを解除')
-        .addStringOption(o => o.setName('category_id').setDescription('カテゴリID').setRequired(true))
+        .addChannelOption(o =>
+          o.setName('category').setDescription('解除するカテゴリ').setRequired(true)
+            .addChannelTypes(ChannelType.GuildCategory)
+        )
     )
     .addSubcommand(sub =>
       sub.setName('listexclude').setDescription('対象外カテゴリ一覧を表示')
@@ -80,7 +88,7 @@ module.exports = {
       sub.setName('addshopitem').setDescription('ショップ商品を追加')
         .addStringOption(o => o.setName('name').setDescription('商品名').setRequired(true))
         .addIntegerOption(o => o.setName('price').setDescription('価格(P)').setMinValue(1).setRequired(true))
-        .addStringOption(o => o.setName('role_id').setDescription('付与するロールID').setRequired(true))
+        .addRoleOption(o => o.setName('role').setDescription('付与するロール').setRequired(true))
     )
     .addSubcommand(sub =>
       sub.setName('removeshopitem').setDescription('ショップ商品を削除')
@@ -100,27 +108,27 @@ module.exports = {
       const channel = interaction.options.getChannel('channel');
       const fieldMap = { ranking: 'ranking_channel_id', result: 'result_channel_id', log: 'log_channel_id' };
       setGuildSetting(interaction.guildId, fieldMap[sub], channel.id);
-      return interaction.reply({ content: `✅ <#${channel.id}> を設定しました。`, ephemeral: true });
+      return interaction.reply({ content: `✅ <#${channel.id}> を設定しました。`, flags: MessageFlags.Ephemeral });
     }
 
     // --- gacha panel ---
     if (group === 'gacha' && sub === 'panel') {
       await sendPanel(interaction.channel, interaction.guildId, db);
-      return interaction.reply({ content: '✅ パネルを設置しました。', ephemeral: true });
+      return interaction.reply({ content: '✅ パネルを設置しました。', flags: MessageFlags.Ephemeral });
     }
 
     // --- addexclude ---
     if (sub === 'addexclude') {
-      const categoryId = interaction.options.getString('category_id');
-      addExcludedCategory(interaction.guildId, categoryId);
-      return interaction.reply({ content: `✅ カテゴリ \`${categoryId}\` を対象外に追加しました。`, ephemeral: true });
+      const category = interaction.options.getChannel('category');
+      addExcludedCategory(interaction.guildId, category.id);
+      return interaction.reply({ content: `✅ カテゴリ **${category.name}** を対象外に追加しました。`, flags: MessageFlags.Ephemeral });
     }
 
     // --- removeexclude ---
     if (sub === 'removeexclude') {
-      const categoryId = interaction.options.getString('category_id');
-      removeExcludedCategory(interaction.guildId, categoryId);
-      return interaction.reply({ content: `✅ カテゴリ \`${categoryId}\` を対象外から解除しました。`, ephemeral: true });
+      const category = interaction.options.getChannel('category');
+      removeExcludedCategory(interaction.guildId, category.id);
+      return interaction.reply({ content: `✅ カテゴリ **${category.name}** を対象外から解除しました。`, flags: MessageFlags.Ephemeral });
     }
 
     // --- listexclude ---
@@ -128,7 +136,7 @@ module.exports = {
       const list = getExcludedCategories(interaction.guildId);
       const desc = list.length > 0 ? list.map(id => `\`${id}\``).join('\n') : 'なし';
       const embed = new EmbedBuilder().setTitle('除外カテゴリ一覧').setDescription(desc).setColor(0x95a5a6);
-      return interaction.reply({ embeds: [embed], ephemeral: true });
+      return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
 
     // --- give ---
@@ -136,7 +144,7 @@ module.exports = {
       const target = interaction.options.getUser('user');
       const amount = interaction.options.getInteger('amount');
       await changeBalance(interaction.client, interaction.guildId, target.id, amount, `管理者付与 by <@${interaction.user.id}>`);
-      return interaction.reply({ content: `✅ <@${target.id}> に ${amount}P を付与しました。`, ephemeral: true });
+      return interaction.reply({ content: `✅ <@${target.id}> に ${amount}P を付与しました。`, flags: MessageFlags.Ephemeral });
     }
 
     // --- take ---
@@ -146,16 +154,16 @@ module.exports = {
       const user = getUser(target.id);
       const actual = Math.min(amount, user.balance);
       await changeBalance(interaction.client, interaction.guildId, target.id, -actual, `管理者徴収 by <@${interaction.user.id}>`);
-      return interaction.reply({ content: `✅ <@${target.id}> から ${actual}P を徴収しました。`, ephemeral: true });
+      return interaction.reply({ content: `✅ <@${target.id}> から ${actual}P を徴収しました。`, flags: MessageFlags.Ephemeral });
     }
 
     // --- addshopitem ---
     if (sub === 'addshopitem') {
       const name = interaction.options.getString('name');
       const price = interaction.options.getInteger('price');
-      const roleId = interaction.options.getString('role_id');
-      const result = addShopItem(interaction.guildId, name, price, roleId);
-      return interaction.reply({ content: `✅ 商品 **${name}** (ID: ${result.lastInsertRowid}) を追加しました。`, ephemeral: true });
+      const role = interaction.options.getRole('role');
+      const result = addShopItem(interaction.guildId, name, price, role.id);
+      return interaction.reply({ content: `✅ 商品 **${name}** (ID: ${result.lastInsertRowid}) を追加しました。ロール: <@&${role.id}>`, flags: MessageFlags.Ephemeral });
     }
 
     // --- removeshopitem ---
@@ -163,15 +171,15 @@ module.exports = {
       const itemId = interaction.options.getInteger('item_id');
       const result = removeShopItem(itemId, interaction.guildId);
       if (result.changes === 0) {
-        return interaction.reply({ content: '❌ 指定された商品が見つかりません。', ephemeral: true });
+        return interaction.reply({ content: '❌ 指定された商品が見つかりません。', flags: MessageFlags.Ephemeral });
       }
-      return interaction.reply({ content: `✅ 商品ID ${itemId} を削除しました。`, ephemeral: true });
+      return interaction.reply({ content: `✅ 商品ID ${itemId} を削除しました。`, flags: MessageFlags.Ephemeral });
     }
 
     // --- resetranking ---
     if (sub === 'resetranking') {
       await postAndResetRanking(interaction.client);
-      return interaction.reply({ content: '✅ ランキングを投稿してリセットしました。', ephemeral: true });
+      return interaction.reply({ content: '✅ ランキングを投稿してリセットしました。', flags: MessageFlags.Ephemeral });
     }
   },
 };

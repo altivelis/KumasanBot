@@ -1,6 +1,6 @@
 'use strict';
 
-const { Events, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, MessageFlags } = require('discord.js');
 const { getUser, updateUser, getGuildSettings } = require('../database');
 const { drawGacha } = require('../handlers/gacha');
 const { playGamble } = require('../handlers/gamble');
@@ -24,7 +24,7 @@ module.exports = {
         await command.execute(interaction);
       } catch (err) {
         console.error(err);
-        const msg = { content: '❌ エラーが発生しました。', ephemeral: true };
+        const msg = { content: '❌ エラーが発生しました。', flags: MessageFlags.Ephemeral };
         if (interaction.replied || interaction.deferred) {
           await interaction.followUp(msg).catch(() => null);
         } else {
@@ -40,7 +40,7 @@ module.exports = {
 
       // ---- ガチャ ----
       if (customId === 'gacha_pull') {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const userData = getUser(user.id);
         if (userData.gacha_tickets < 1) {
           return interaction.editReply({ content: '❌ ガチャ券が足りません。' });
@@ -69,7 +69,7 @@ module.exports = {
 
       // ---- ギャンブル ----
       if (customId === 'gamble_play') {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const userData = getUser(user.id);
         if (userData.balance < 100) {
           return interaction.editReply({ content: '❌ 残高が100P未満のためギャンブルできません。' });
@@ -119,13 +119,13 @@ module.exports = {
 
         // 操作できるのは targetId のみ
         if (user.id !== targetId) {
-          return interaction.reply({ content: '❌ この操作はあなたには許可されていません。', ephemeral: true });
+          return interaction.reply({ content: '❌ この操作はあなたには許可されていません。', flags: MessageFlags.Ephemeral });
         }
 
         await interaction.deferUpdate();
         const result = await transfer(client, guildId, targetId, requesterId, amount);
         if (!result.success) {
-          return interaction.followUp({ content: '❌ 残高不足のため承認できません。', ephemeral: true });
+          return interaction.followUp({ content: '❌ 残高不足のため承認できません。', flags: MessageFlags.Ephemeral });
         }
 
         const embed = new EmbedBuilder()
@@ -141,7 +141,7 @@ module.exports = {
       if (customId.startsWith('request_deny:')) {
         const [, requesterId, targetId] = customId.split(':');
         if (user.id !== targetId) {
-          return interaction.reply({ content: '❌ この操作はあなたには許可されていません。', ephemeral: true });
+          return interaction.reply({ content: '❌ この操作はあなたには許可されていません。', flags: MessageFlags.Ephemeral });
         }
 
         await interaction.deferUpdate();

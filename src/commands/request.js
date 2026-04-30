@@ -1,6 +1,6 @@
 'use strict';
 
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } = require('discord.js');
 const { getUser } = require('../database');
 const { transfer } = require('../handlers/economy');
 
@@ -19,10 +19,10 @@ module.exports = {
     const amount = interaction.options.getInteger('amount');
 
     if (target.id === interaction.user.id) {
-      return interaction.reply({ content: '自分自身には請求できません。', ephemeral: true });
+      return interaction.reply({ content: '自分自身には請求できません。', flags: MessageFlags.Ephemeral });
     }
     if (target.bot) {
-      return interaction.reply({ content: 'Botには請求できません。', ephemeral: true });
+      return interaction.reply({ content: 'Botには請求できません。', flags: MessageFlags.Ephemeral });
     }
 
     const requesterId = interaction.user.id;

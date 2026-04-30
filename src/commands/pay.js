@@ -1,6 +1,6 @@
 'use strict';
 
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 const { transfer } = require('../handlers/economy');
 
 module.exports = {
@@ -18,10 +18,10 @@ module.exports = {
     const amount = interaction.options.getInteger('amount');
 
     if (target.id === interaction.user.id) {
-      return interaction.reply({ content: '自分自身には送金できません。', ephemeral: true });
+      return interaction.reply({ content: '自分自身には送金できません。', flags: MessageFlags.Ephemeral });
     }
     if (target.bot) {
-      return interaction.reply({ content: 'Botには送金できません。', ephemeral: true });
+      return interaction.reply({ content: 'Botには送金できません。', flags: MessageFlags.Ephemeral });
     }
 
     const result = await transfer(
@@ -33,7 +33,7 @@ module.exports = {
     );
 
     if (!result.success) {
-      return interaction.reply({ content: `❌ 残高不足のため送金できません。`, ephemeral: true });
+      return interaction.reply({ content: `❌ 残高不足のため送金できません。`, flags: MessageFlags.Ephemeral });
     }
 
     const embed = new EmbedBuilder()
