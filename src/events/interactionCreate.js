@@ -36,6 +36,7 @@ module.exports = {
 
     // ボタン
     if (interaction.isButton()) {
+      try {
       const { customId, guildId, user } = interaction;
 
       // ---- ガチャ ----
@@ -177,6 +178,20 @@ module.exports = {
         await interaction.deferUpdate();
         await interaction.editReply({ content: '❌ リセットをキャンセルしました。', embeds: [], components: [] });
         return;
+      }
+      } catch (err) {
+        if (err.code === 10062) {
+          // インタラクションが既に期限切れ（3秒超過）のため無視
+          console.warn('[interactionCreate] Interaction expired (10062), skipping response.');
+          return;
+        }
+        console.error('[interactionCreate] Button handler error:', err);
+        const msg = { content: '❌ エラーが発生しました。', flags: MessageFlags.Ephemeral };
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp(msg).catch(() => null);
+        } else {
+          await interaction.reply(msg).catch(() => null);
+        }
       }
     }
   },
