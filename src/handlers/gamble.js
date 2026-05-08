@@ -1,27 +1,48 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
+const CONFIG_PATH = path.join(__dirname, '../../config/gamble.config.json');
+
 /**
- * ギャンブル抽選ロジック
- * 確率合計 = 100%
+ * ギャンブル設定をファイルから読み込む（毎回再読み込みして設定変更を即反映）
+ */
+function loadConfig() {
+  const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');
+  return JSON.parse(raw);
+}
+
+/**
+ * ギャンブル抽選ロジック（確率は config/gamble.config.json で管理）
  * @returns {{ result: string, points: number, isFullLoss: boolean }}
  */
 function playGamble() {
-  const rand = Math.random() * 100;
+  const { outcomes } = loadConfig();
 
-  // 大当たり 0.001%
-  if (rand < 0.001) return { result: '🎉 大当たり！', points: 3000, isFullLoss: false };
-  // 全ロス 0.001% (0.001 ～ 0.002)
-  if (rand < 0.002) return { result: '💀 全ロス...', points: 0, isFullLoss: true };
-  // 当たり② 10% (0.002 ～ 10.002)
-  if (rand < 10.002) return { result: '🎊 当たり！ (800P)', points: 800, isFullLoss: false };
-  // 当たり① 20% (10.002 ～ 30.002)
-  if (rand < 30.002) return { result: '🎊 当たり！ (500P)', points: 500, isFullLoss: false };
-  // 小当たり② 10% (30.002 ～ 40.002)
-  if (rand < 40.002) return { result: '✨ 小当たり (10P)', points: 10, isFullLoss: false };
-  // 小当たり① 15% (40.002 ～ 55.002)
-  if (rand < 55.002) return { result: '✨ 小当たり (5P)', points: 5, isFullLoss: false };
-  // はずれ 44.998% (55.002 ～ 100)
-  return { result: '😢 はずれ', points: 0, isFullLoss: false };
+  // 確率の合計値を基準にランダム値を生成（合計が100でなくても正しく動作する）
+  const total = outcomes.reduce((sum, o) => sum + o.probability, 0);
+  const rand = Math.random() * total;
+
+  let cumulative = 0;
+  for (const outcome of outcomes) {
+    cumulative += outcome.probability;
+    if (rand < cumulative) {
+      return {
+        result: `${outcome.emoji} ${outcome.label}`,
+        points: outcome.points,
+        isFullLoss: outcome.isFullLoss ?? false,
+      };
+    }
+  }
+
+  // フォールバック（浮動小数点誤差対策）
+  const last = outcomes[outcomes.length - 1];
+  return {
+    result: `${last.emoji} ${last.label}`,
+    points: last.points,
+    isFullLoss: last.isFullLoss ?? false,
+  };
 }
 
 module.exports = { playGamble };

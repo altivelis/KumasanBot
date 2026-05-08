@@ -38,3 +38,5 @@
 - [x] 34. /admin resetusers サブコマンド定義を admin.js に追加
 - [x] 35. resetusers の確認ボタンハンドラを interactionCreate.js に追加
 - [x] 36. deploy-commands.js を再実行してスラッシュコマンドを更新
+- [x] 37. ギャンブル確率・報酬を `config/gamble.config.json` で外部管理化（gamble.js をconfig読み込み方式に変更）
+- [x] 38. `/balance` `/status` `/pay` `/shop` `/buy` の返答を ephemeral に変更

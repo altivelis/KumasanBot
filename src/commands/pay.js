@@ -41,6 +41,6 @@ module.exports = {
       .setColor(0x2ecc71)
       .setDescription(`<@${interaction.user.id}> → <@${target.id}> へ **${amount}P** を送金しました`);
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   },
 };

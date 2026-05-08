@@ -1,6 +1,6 @@
 'use strict';
 
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 const { getUser } = require('../database');
 
 function formatTime(minutes) {
@@ -24,6 +24,6 @@ module.exports = {
         { name: '🎟️ ガチャ券', value: `${user.gacha_tickets}枚`, inline: true },
         { name: '🎙️ 今週のVC滞在時間', value: formatTime(user.weekly_vc_minutes), inline: true }
       );
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   },
 };

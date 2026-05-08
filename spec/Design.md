@@ -16,6 +16,8 @@
 KumasanBot/
 ├── .env                        # トークン・設定値
 ├── package.json
+├── config/
+│   └── gamble.config.json      # ギャンブル確率・報酬設定（JSON）
 ├── src/
 │   ├── index.js                # エントリーポイント（Bot起動・イベント登録）
 │   ├── deploy-commands.js      # スラッシュコマンド登録スクリプト
@@ -162,12 +164,15 @@ voiceStateUpdate イベント
 パネルの「ギャンブルをする」ボタン押下
   ├─ balance < 100 → エラー返信（ephemeral）
   ├─ balance -= 100（掛け金）
-  ├─ 乱数で抽選（0.001/20/10/0.001/44.998/15/10%）
+  ├─ config/gamble.config.json を読み込み、確率の重み付き抽選を実施
+  │   （確率合計値を基準に乱数生成するため、合計が100以外でも正しく動作）
   ├─ 全ロス時: balance = 0、result_channel に3ロールメンション付きで通知
   ├─ その他: balance += 当選P
   ├─ result_channel に結果Embed送信（全員可視）
   └─ P変動ログ送信
 ```
+
+> ギャンブル確率・報酬の変更は `config/gamble.config.json` を編集するだけで反映される（Botの再起動不要）
 
 ### 送金・請求
 

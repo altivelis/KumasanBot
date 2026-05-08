@@ -19,6 +19,6 @@ module.exports = {
       itemId,
       interaction.member
     );
-    await interaction.reply({ content: result.message, flags: result.success ? undefined : MessageFlags.Ephemeral });
+    await interaction.reply({ content: result.message, flags: MessageFlags.Ephemeral });
   },
 };

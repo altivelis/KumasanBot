@@ -1,0 +1,11 @@
+{
+  "outcomes": [
+    { "label": "超大当たり", "emoji": "🎉", "points": 3000, "probability": 0.5,  "isFullLoss": false },
+    { "label": "大当たり",   "emoji": "🎊", "points": 500,  "probability": 1.1,  "isFullLoss": false },
+    { "label": "中当たり",   "emoji": "✨", "points": 300,  "probability": 1.5,  "isFullLoss": false },
+    { "label": "ちょい勝ち", "emoji": "😊", "points": 110,  "probability": 20.0, "isFullLoss": false },
+    { "label": "ほぼトントン","emoji": "😐", "points": 90,   "probability": 40.0, "isFullLoss": false },
+    { "label": "ちょい負け", "emoji": "😅", "points": 40,   "probability": 36.4, "isFullLoss": false },
+    { "label": "全ロス",     "emoji": "💀", "points": 0,    "probability": 0.5,  "isFullLoss": true  }
+  ]
+}
