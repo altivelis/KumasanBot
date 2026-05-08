@@ -1,6 +1,10 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+
+const GAMBLE_CONFIG_PATH = path.join(__dirname, '../../config/gamble.config.json');
 
 /**
  * ガチャ＋ギャンブル統合パネルを生成して送信する
@@ -40,16 +44,14 @@ async function sendPanel(channel, guildId, dbModule) {
       },
       {
         name: '🎲 ギャンブル',
-        value: [
-          '**100P消費（返還なし）**',
-          '🎉 大当たり 3000P … 0.001%',
-          '🎊 当たり 800P … 10%',
-          '🎊 当たり 500P … 20%',
-          '✨ 小当たり 10P … 10%',
-          '✨ 小当たり 5P … 15%',
-          '😢 はずれ 0P … 44.998%',
-          '💀 全ロス 0P … 0.001%',
-        ].join('\n'),
+        value: (() => {
+          const { outcomes } = JSON.parse(fs.readFileSync(GAMBLE_CONFIG_PATH, 'utf-8'));
+          const lines = ['**100P消費（返還なし）**'];
+          for (const o of outcomes) {
+            lines.push(`${o.emoji} ${o.label} ${o.points}P … ${o.probability}%`);
+          }
+          return lines.join('\n');
+        })(),
         inline: true,
       }
     );
